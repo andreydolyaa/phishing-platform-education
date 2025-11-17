@@ -386,7 +386,7 @@ app.get('/admin', (req, res) => {
             <div id="result">
               <div class="result-label">Generated Link</div>
               <div class="result-value"><a href="#" id="linkUrl" target="_blank"></a></div>
-              <button class="copy-btn" onclick="copyToClipboard('linkUrl')">Copy to Clipboard</button>
+              <button class="copy-btn" onclick="copyToClipboard('linkUrl', event)">Copy to Clipboard</button>
             </div>
           </div>
 
@@ -400,8 +400,8 @@ app.get('/admin', (req, res) => {
               <div class="result-label">Generated Links (<span id="linkCount">0</span>)</div>
               <div id="bulkLinkList"></div>
               <div class="action-buttons">
-                <button class="copy-btn" onclick="copyAllLinksText()">Copy All Links</button>
-                <button class="copy-btn" onclick="copyArrayOutput()">Copy Array JSON</button>
+                <button class="copy-btn" onclick="copyAllLinksText(event)">Copy All Links</button>
+                <button class="copy-btn" onclick="copyArrayOutput(event)">Copy Array JSON</button>
                 <button class="copy-btn" onclick="downloadLinks()">Download as TXT</button>
               </div>
               <div class="result-label" style="margin-top: 20px;">Array Output (JSON)</div>
@@ -435,7 +435,7 @@ app.get('/admin', (req, res) => {
             return;
           }
 
-          const url = window.location.protocol + window.location.host + '/generate-link?username=' + encodeURIComponent(username) + '&key=${key}';
+          const url = window.location.protocol + '//' + window.location.host + '/generate-link?username=' + encodeURIComponent(username) + '&key=${key}';
           fetch(url)
             .then(r => r.json())
             .then(data => {
@@ -447,7 +447,7 @@ app.get('/admin', (req, res) => {
             .catch(err => alert('Error: ' + err));
         }
 
-        function copyToClipboard(elementId) {
+        function copyToClipboard(elementId, event) {
           const element = document.getElementById(elementId);
           const text = element.textContent || element.innerText;
           
@@ -508,7 +508,7 @@ app.get('/admin', (req, res) => {
 
           for (const username of usernames) {
             try {
-              const url = window.location.protocol + window.location.host + '/generate-link?username=' + encodeURIComponent(username) + '&key=${key}';
+              const url = window.location.protocol + '//' + window.location.host + '/generate-link?username=' + encodeURIComponent(username) + '&key=${key}';
               const response = await fetch(url);
               const data = await response.json();
               bulkLinksArray.push({ username: username, url: data.url });
@@ -523,7 +523,7 @@ app.get('/admin', (req, res) => {
               <div class="bulk-username">\${item.username}</div>
               <div class="bulk-item-content">
                 <div class="bulk-link">\${item.url}</div>
-                <button class="bulk-item-copy" onclick="copyIndividualLink(\${index})">Copy</button>
+                <button class="bulk-item-copy" onclick="copyIndividualLink(\${index}, event)">Copy</button>
               </div>
             </div>
           \`).join('');
@@ -535,7 +535,7 @@ app.get('/admin', (req, res) => {
           document.getElementById('linkCount').textContent = bulkLinksArray.length;
         }
 
-        function copyAllLinksText() {
+        function copyAllLinksText(event) {
           const text = bulkLinksArray.map(item => item.url).join('\\n');
           
           if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -550,7 +550,7 @@ app.get('/admin', (req, res) => {
           }
         }
 
-        function copyArrayOutput() {
+        function copyArrayOutput(event) {
           const arrayText = JSON.stringify(bulkLinksArray, null, 2);
           
           if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -565,7 +565,7 @@ app.get('/admin', (req, res) => {
           }
         }
 
-        function copyIndividualLink(index) {
+        function copyIndividualLink(index, event) {
           const link = bulkLinksArray[index].url;
           
           if (navigator.clipboard && navigator.clipboard.writeText) {
